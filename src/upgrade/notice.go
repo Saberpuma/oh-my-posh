@@ -37,8 +37,8 @@ A new release of Oh My Posh is available: %s → %s
 `
 	windows = `To upgrade, use the guide for your favorite package manager in the documentation:
 https://ohmyposh.dev/docs/installation/windows#update`
-	unix   = "To upgrade, use your favorite package manager or, if you used Homebrew to install, run: 'brew update && brew upgrade oh-my-posh'"
-	darwin = "To upgrade, run: 'brew update && brew upgrade oh-my-posh'"
+	unix   = "To upgrade, use your favorite package manager or, if you used Homebrew to install, run: 'brew update; brew upgrade oh-my-posh'"
+	darwin = "To upgrade, run: 'brew update; brew upgrade oh-my-posh'"
 
 	CACHEKEY = "upgrade_check"
 )
@@ -59,12 +59,13 @@ func Latest(env platform.Environment) (string, error) {
 //
 // The upgrade check is only performed every other week.
 func Notice(env platform.Environment) (string, bool) {
-	// never validate when we install using the Windows Store
-	if env.Getenv("POSH_INSTALLER") == "ws" {
-		return "", false
-	}
 	// do not check when last validation was < 1 week ago
 	if _, OK := env.Cache().Get(CACHEKEY); OK {
+		return "", false
+	}
+
+	// never validate when we install using the Windows Store
+	if env.Getenv("POSH_INSTALLER") == "ws" {
 		return "", false
 	}
 

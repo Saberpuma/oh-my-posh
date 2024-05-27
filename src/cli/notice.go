@@ -14,7 +14,7 @@ var noticeCmd = &cobra.Command{
 	Short: "Print the upgrade notice when a new version is available.",
 	Long:  "Print the upgrade notice when a new version is available.",
 	Args:  cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		env := &platform.Shell{
 			CmdFlags: &platform.Flags{},
 		}
@@ -27,6 +27,6 @@ var noticeCmd = &cobra.Command{
 	},
 }
 
-func init() { //nolint:gochecknoinits
+func init() {
 	RootCmd.AddCommand(noticeCmd)
 }

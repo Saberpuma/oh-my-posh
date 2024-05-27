@@ -12,7 +12,7 @@ import (
 	"github.com/jandedobbeleer/oh-my-posh/src/regex"
 	"golang.org/x/exp/slices"
 
-	"github.com/BurntSushi/toml"
+	toml "github.com/pelletier/go-toml/v2"
 )
 
 type ProjectItem struct {
@@ -33,9 +33,10 @@ type CargoTOML struct {
 	Package ProjectData
 }
 
-// Python Poetry package
+// Python package
 type PyProjectTOML struct {
-	Tool PyProjectToolTOML
+	Project ProjectData
+	Tool    PyProjectToolTOML
 }
 
 type PyProjectToolTOML struct {
@@ -95,9 +96,9 @@ func (n *Project) Init(props properties.Properties, env platform.Environment) {
 			Fetcher: n.getCargoPackage,
 		},
 		{
-			Name:    "poetry",
+			Name:    "python",
 			Files:   []string{"pyproject.toml"},
-			Fetcher: n.getPoetryPackage,
+			Fetcher: n.getPythonPackage,
 		},
 		{
 			Name:    "php",
@@ -153,7 +154,7 @@ func (n *Project) getCargoPackage(item ProjectItem) *ProjectData {
 	content := n.env.FileContent(item.Files[0])
 
 	var data CargoTOML
-	_, err := toml.Decode(content, &data)
+	err := toml.Unmarshal([]byte(content), &data)
 	if err != nil {
 		n.Error = err.Error()
 		return nil
@@ -165,19 +166,25 @@ func (n *Project) getCargoPackage(item ProjectItem) *ProjectData {
 	}
 }
 
-func (n *Project) getPoetryPackage(item ProjectItem) *ProjectData {
+func (n *Project) getPythonPackage(item ProjectItem) *ProjectData {
 	content := n.env.FileContent(item.Files[0])
 
 	var data PyProjectTOML
-	_, err := toml.Decode(content, &data)
+	err := toml.Unmarshal([]byte(content), &data)
 	if err != nil {
 		n.Error = err.Error()
 		return nil
 	}
 
+	if len(data.Tool.Poetry.Version) != 0 || len(data.Tool.Poetry.Name) != 0 {
+		return &ProjectData{
+			Version: data.Tool.Poetry.Version,
+			Name:    data.Tool.Poetry.Name,
+		}
+	}
 	return &ProjectData{
-		Version: data.Tool.Poetry.Version,
-		Name:    data.Tool.Poetry.Name,
+		Version: data.Project.Version,
+		Name:    data.Project.Name,
 	}
 }
 
@@ -286,7 +293,7 @@ func (n *Project) getProjectData(item ProjectItem) *ProjectData {
 	content := n.env.FileContent(item.Files[0])
 
 	var data ProjectData
-	_, err := toml.Decode(content, &data)
+	err := toml.Unmarshal([]byte(content), &data)
 	if err != nil {
 		n.Error = err.Error()
 		return nil

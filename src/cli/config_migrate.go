@@ -38,7 +38,7 @@ Migrates the ~/myconfig.omp.json config file to TOML and writes the result to yo
 
 A backup of the current config can be found at ~/myconfig.omp.json.bak.`,
 	Args: cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		env := &platform.Shell{
 			CmdFlags: &platform.Flags{
 				Config:  config,
@@ -57,7 +57,7 @@ A backup of the current config can be found at ~/myconfig.omp.json.bak.`,
 	},
 }
 
-func init() { //nolint:gochecknoinits
+func init() {
 	migrateCmd.Flags().BoolVarP(&write, "write", "w", false, "write the migrated config back to the config file")
 	migrateCmd.Flags().StringVarP(&format, "format", "f", "json", "the config format to migrate to")
 	configCmd.AddCommand(migrateCmd)

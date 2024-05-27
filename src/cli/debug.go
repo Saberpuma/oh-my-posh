@@ -19,8 +19,9 @@ var debugCmd = &cobra.Command{
 	Short: "Print the prompt in debug mode",
 	Long:  "Print the prompt in debug mode.",
 	Args:  cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		startTime := time.Now()
+
 		env := &platform.Shell{
 			CmdFlags: &platform.Flags{
 				Config: config,
@@ -30,9 +31,15 @@ var debugCmd = &cobra.Command{
 				Plain:  plain,
 			},
 		}
+
 		env.Init()
 		defer env.Close()
+
 		cfg := engine.LoadConfig(env)
+
+		// add variables to the environment
+		env.Var = cfg.Var
+
 		writerColors := cfg.MakeColors()
 		writer := &ansi.Writer{
 			TerminalBackground: shell.ConsoleBackgroundColor(env, cfg.TerminalBackground),
@@ -40,6 +47,7 @@ var debugCmd = &cobra.Command{
 			Plain:              plain,
 			TrueColor:          env.CmdFlags.TrueColor,
 		}
+
 		writer.Init(shell.GENERIC)
 		eng := &engine.Engine{
 			Config: cfg,
@@ -47,11 +55,12 @@ var debugCmd = &cobra.Command{
 			Writer: writer,
 			Plain:  plain,
 		}
+
 		fmt.Print(eng.PrintDebug(startTime, build.Version))
 	},
 }
 
-func init() { //nolint:gochecknoinits
+func init() {
 	debugCmd.Flags().StringVar(&pwd, "pwd", "", "current working directory")
 	debugCmd.Flags().StringVar(&shellName, "shell", "", "the shell to print for")
 	debugCmd.Flags().BoolVarP(&plain, "plain", "p", false, "plain text output (no ANSI)")

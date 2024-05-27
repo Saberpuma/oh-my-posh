@@ -20,28 +20,29 @@ import (
 
 // Segment represent a single segment and it's configuration
 type Segment struct {
-	Type                SegmentType    `json:"type,omitempty"`
-	Tips                []string       `json:"tips,omitempty"`
-	Style               SegmentStyle   `json:"style,omitempty"`
-	PowerlineSymbol     string         `json:"powerline_symbol,omitempty"`
-	InvertPowerline     bool           `json:"invert_powerline,omitempty"`
-	Foreground          string         `json:"foreground,omitempty"`
-	ForegroundTemplates template.List  `json:"foreground_templates,omitempty"`
-	Background          string         `json:"background,omitempty"`
-	BackgroundTemplates template.List  `json:"background_templates,omitempty"`
-	LeadingDiamond      string         `json:"leading_diamond,omitempty"`
-	TrailingDiamond     string         `json:"trailing_diamond,omitempty"`
-	Template            string         `json:"template,omitempty"`
-	Templates           template.List  `json:"templates,omitempty"`
-	TemplatesLogic      template.Logic `json:"templates_logic,omitempty"`
-	Properties          properties.Map `json:"properties,omitempty"`
-	Interactive         bool           `json:"interactive,omitempty"`
-	Alias               string         `json:"alias,omitempty"`
-	MaxWidth            int            `json:"max_width,omitempty"`
-	MinWidth            int            `json:"min_width,omitempty"`
-	Filler              string         `json:"filler,omitempty"`
+	Type                   SegmentType    `json:"type,omitempty" toml:"type,omitempty"`
+	Tips                   []string       `json:"tips,omitempty" toml:"tips,omitempty"`
+	Style                  SegmentStyle   `json:"style,omitempty" toml:"style,omitempty"`
+	PowerlineSymbol        string         `json:"powerline_symbol,omitempty" toml:"powerline_symbol,omitempty"`
+	LeadingPowerlineSymbol string         `json:"leading_powerline_symbol,omitempty" toml:"leading_powerline_symbol,omitempty"`
+	InvertPowerline        bool           `json:"invert_powerline,omitempty" toml:"invert_powerline,omitempty"`
+	Foreground             string         `json:"foreground,omitempty" toml:"foreground,omitempty"`
+	ForegroundTemplates    template.List  `json:"foreground_templates,omitempty" toml:"foreground_templates,omitempty"`
+	Background             string         `json:"background,omitempty" toml:"background,omitempty"`
+	BackgroundTemplates    template.List  `json:"background_templates,omitempty" toml:"background_templates,omitempty"`
+	LeadingDiamond         string         `json:"leading_diamond,omitempty" toml:"leading_diamond,omitempty"`
+	TrailingDiamond        string         `json:"trailing_diamond,omitempty" toml:"trailing_diamond,omitempty"`
+	Template               string         `json:"template,omitempty" toml:"template,omitempty"`
+	Templates              template.List  `json:"templates,omitempty" toml:"templates,omitempty"`
+	TemplatesLogic         template.Logic `json:"templates_logic,omitempty" toml:"templates_logic,omitempty"`
+	Properties             properties.Map `json:"properties,omitempty" toml:"properties,omitempty"`
+	Interactive            bool           `json:"interactive,omitempty" toml:"interactive,omitempty"`
+	Alias                  string         `json:"alias,omitempty" toml:"alias,omitempty"`
+	MaxWidth               int            `json:"max_width,omitempty" toml:"max_width,omitempty"`
+	MinWidth               int            `json:"min_width,omitempty" toml:"min_width,omitempty"`
+	Filler                 string         `json:"filler,omitempty" toml:"filler,omitempty"`
 
-	Enabled bool `json:"-"`
+	Enabled bool `json:"-" toml:"-"`
 
 	colors     *ansi.Colors
 	env        platform.Environment
@@ -146,6 +147,8 @@ const (
 	FOSSIL SegmentType = "fossil"
 	// GCP writes the active GCP context
 	GCP SegmentType = "gcp"
+	// FIREBASE writes the active firebase project
+	FIREBASE SegmentType = "firebase"
 	// GIT represents the git status and information
 	GIT SegmentType = "git"
 	// GITVERSION represents the gitversion information
@@ -158,8 +161,6 @@ const (
 	HELM SegmentType = "helm"
 	// IPIFY segment
 	IPIFY SegmentType = "ipify"
-	// ITERM inserts the Shell Integration prompt mark on iTerm zsh/bash/fish
-	ITERM SegmentType = "iterm"
 	// JAVA writes the active java version
 	JAVA SegmentType = "java"
 	// JULIA writes which julia version is currently active
@@ -186,6 +187,8 @@ const (
 	NPM SegmentType = "npm"
 	// NX writes which Nx version us currently active
 	NX SegmentType = "nx"
+	// OCAML writes the active Ocaml version
+	OCAML SegmentType = "ocaml"
 	// OS write os specific icon
 	OS SegmentType = "os"
 	// OWM writes the weather coming from openweatherdata
@@ -200,12 +203,16 @@ const (
 	PLASTIC SegmentType = "plastic"
 	// Project version
 	PROJECT SegmentType = "project"
+	// PULUMI writes the pulumi user, store and stack
+	PULUMI SegmentType = "pulumi"
 	// PYTHON writes the virtual env name
 	PYTHON SegmentType = "python"
 	// QUASAR writes the QUASAR version and context
 	QUASAR SegmentType = "quasar"
 	// R version
 	R SegmentType = "r"
+	// REACT writes the current react version
+	REACT SegmentType = "react"
 	// ROOT writes root symbol
 	ROOT SegmentType = "root"
 	// RUBY writes which ruby version is currently active
@@ -232,6 +239,8 @@ const (
 	SWIFT SegmentType = "swift"
 	// SYSTEMINFO writes system information (memory, cpu, load)
 	SYSTEMINFO SegmentType = "sysinfo"
+	// TALOSCTL writes the talosctl context
+	TALOSCTL SegmentType = "talosctl"
 	// TERRAFORM writes the terraform workspace we're currently in
 	TERRAFORM SegmentType = "terraform"
 	// TEXT writes a text
@@ -290,13 +299,13 @@ var Segments = map[SegmentType]func() SegmentWriter{
 	FLUTTER:         func() SegmentWriter { return &segments.Flutter{} },
 	FOSSIL:          func() SegmentWriter { return &segments.Fossil{} },
 	GCP:             func() SegmentWriter { return &segments.Gcp{} },
+	FIREBASE:        func() SegmentWriter { return &segments.Firebase{} },
 	GIT:             func() SegmentWriter { return &segments.Git{} },
 	GITVERSION:      func() SegmentWriter { return &segments.GitVersion{} },
 	GOLANG:          func() SegmentWriter { return &segments.Golang{} },
 	HASKELL:         func() SegmentWriter { return &segments.Haskell{} },
 	HELM:            func() SegmentWriter { return &segments.Helm{} },
 	IPIFY:           func() SegmentWriter { return &segments.IPify{} },
-	ITERM:           func() SegmentWriter { return &segments.ITerm{} },
 	JAVA:            func() SegmentWriter { return &segments.Java{} },
 	JULIA:           func() SegmentWriter { return &segments.Julia{} },
 	KOTLIN:          func() SegmentWriter { return &segments.Kotlin{} },
@@ -310,6 +319,7 @@ var Segments = map[SegmentType]func() SegmentWriter{
 	NODE:            func() SegmentWriter { return &segments.Node{} },
 	NPM:             func() SegmentWriter { return &segments.Npm{} },
 	NX:              func() SegmentWriter { return &segments.Nx{} },
+	OCAML:           func() SegmentWriter { return &segments.OCaml{} },
 	OS:              func() SegmentWriter { return &segments.Os{} },
 	OWM:             func() SegmentWriter { return &segments.Owm{} },
 	PATH:            func() SegmentWriter { return &segments.Path{} },
@@ -317,9 +327,11 @@ var Segments = map[SegmentType]func() SegmentWriter{
 	PHP:             func() SegmentWriter { return &segments.Php{} },
 	PLASTIC:         func() SegmentWriter { return &segments.Plastic{} },
 	PROJECT:         func() SegmentWriter { return &segments.Project{} },
+	PULUMI:          func() SegmentWriter { return &segments.Pulumi{} },
 	PYTHON:          func() SegmentWriter { return &segments.Python{} },
 	QUASAR:          func() SegmentWriter { return &segments.Quasar{} },
 	R:               func() SegmentWriter { return &segments.R{} },
+	REACT:           func() SegmentWriter { return &segments.React{} },
 	ROOT:            func() SegmentWriter { return &segments.Root{} },
 	RUBY:            func() SegmentWriter { return &segments.Ruby{} },
 	RUST:            func() SegmentWriter { return &segments.Rust{} },
@@ -333,6 +345,7 @@ var Segments = map[SegmentType]func() SegmentWriter{
 	SVN:             func() SegmentWriter { return &segments.Svn{} },
 	SWIFT:           func() SegmentWriter { return &segments.Swift{} },
 	SYSTEMINFO:      func() SegmentWriter { return &segments.SystemInfo{} },
+	TALOSCTL:        func() SegmentWriter { return &segments.TalosCTL{} },
 	TERRAFORM:       func() SegmentWriter { return &segments.Terraform{} },
 	TEXT:            func() SegmentWriter { return &segments.Text{} },
 	TIME:            func() SegmentWriter { return &segments.Time{} },
@@ -368,6 +381,14 @@ func (segment *Segment) shouldIncludeFolder() bool {
 func (segment *Segment) isPowerline() bool {
 	style := segment.style()
 	return style == Powerline || style == Accordion
+}
+
+func (segment *Segment) hasEmptyDiamondAtEnd() bool {
+	if segment.style() != Diamond {
+		return false
+	}
+
+	return len(segment.TrailingDiamond) == 0
 }
 
 func (segment *Segment) cwdIncluded() bool {
